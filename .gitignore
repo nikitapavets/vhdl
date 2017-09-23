@@ -1,3 +1,4 @@
-/*
-!*.vhd
-!*.pdf
+*.cache/
+*.hw/
+*.sim/
+*.xpr
