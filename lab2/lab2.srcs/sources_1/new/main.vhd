@@ -5,7 +5,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 
 entity main is
---  Port ( );
+    port (
+        CLR: in 
+    );
 end main;
 
 architecture Behavioral of main is
