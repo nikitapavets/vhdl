@@ -3,10 +3,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.all;
 use std.textio.all;
 
-entity main_tb_file is
-end main_tb_file;
+entity main_tb_file_mod is
+end main_tb_file_mod;
 
-architecture Behavioral of main_tb_file is
+architecture Behavioral of main_tb_file_mod is
     component main is   
         port ( A : in STD_LOGIC_VECTOR (4 downto 1);
                B : in STD_LOGIC_VECTOR (4 downto 1);
@@ -32,15 +32,13 @@ architecture Behavioral of main_tb_file is
     constant failed : string(1 to 6) := "failed";
     
     file file_read : text open read_mode is "D:\university\vhdl\vhdl\lab1\tb\tb.txt";
-    file file_read_ethalon : text open read_mode is "D:\university\vhdl\vhdl\lab1\tb\tb_ethalon.txt";
-    file file_write : text open write_mode is "D:\university\vhdl\vhdl\lab1\tb\tb_out.txt";
-    file file_write_mod : text open write_mode is "D:\university\vhdl\vhdl\lab1\tb\tb_out_mod.txt";
+    file file_write : text open write_mode is "D:\university\vhdl\vhdl\lab1\tb\tb_out_mod.txt";
 begin
     main_map: main port map(inA, inB, inC0(1), outC4(1), outZ);
     main_mod_map: main_mod port map(inA, inB, inC0(1), outC4_mod(1), outZ_mod);
   
     process
-        variable row, row_ethalon, row_out, row_out_mod : line;
+        variable row, row_ethalon, row_out : line;
         variable v_data_read, v_data_read_ethalon : integer;
     begin
 
@@ -55,12 +53,9 @@ begin
                     inA <= std_logic_vector(to_unsigned(v_data_read, inA'length));
                     read(row, v_data_read);
                     inB <= std_logic_vector(to_unsigned(v_data_read, inB'length));
-                  
-                    readline(file_read_ethalon, row_ethalon);
-                    read(row_ethalon, v_data_read_ethalon);
-                    if (v_data_read_ethalon = to_integer(unsigned(outZ))) then
-                        read(row_ethalon, v_data_read_ethalon);
-                        if (v_data_read_ethalon = to_integer(unsigned(outC4))) then
+                    
+                    if (to_integer(unsigned(outZ_mod)) = to_integer(unsigned(outZ))) then
+                        if (to_integer(unsigned(outC4_mod)) = to_integer(unsigned(outC4))) then
                             write (row_out, success);
                         else
                             write (row_out, failed);
@@ -68,18 +63,8 @@ begin
                     else
                         write (row_out, failed);
                     end if;
-                    writeline (file_write, row_out);
                     
-                    if (to_integer(unsigned(outZ_mod)) = to_integer(unsigned(outZ))) then
-                        if (to_integer(unsigned(outC4_mod)) = to_integer(unsigned(outC4))) then
-                            write (row_out_mod, success);
-                        else
-                            write (row_out_mod, failed);
-                        end if;
-                    else
-                        write (row_out_mod, failed);
-                    end if;
-                    writeline (file_write_mod, row_out_mod);
+                    writeline (file_write, row_out);
           
                     wait for 1 ns;
                     
