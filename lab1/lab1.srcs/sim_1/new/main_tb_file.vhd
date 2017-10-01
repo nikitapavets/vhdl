@@ -25,8 +25,8 @@ architecture Behavioral of main_tb_file is
     
     signal inC0 : STD_LOGIC_VECTOR (1 downto 1);
     signal inA, inB : STD_LOGIC_VECTOR (4 downto 1);
-    signal outC4, outC4_mod : STD_LOGIC_VECTOR (1 downto 1);
-    signal outZ, outZ_mod : STD_LOGIC_VECTOR (4 downto 1);
+    signal outC4 : STD_LOGIC_VECTOR (1 downto 1);
+    signal outZ : STD_LOGIC_VECTOR (4 downto 1);
     
     constant success : string(1 to 2) := "ok";
     constant failed : string(1 to 6) := "failed";
@@ -34,10 +34,8 @@ architecture Behavioral of main_tb_file is
     file file_read : text open read_mode is "D:\university\vhdl\vhdl\lab1\tb\tb.txt";
     file file_read_ethalon : text open read_mode is "D:\university\vhdl\vhdl\lab1\tb\tb_ethalon.txt";
     file file_write : text open write_mode is "D:\university\vhdl\vhdl\lab1\tb\tb_out.txt";
-    file file_write_mod : text open write_mode is "D:\university\vhdl\vhdl\lab1\tb\tb_out_mod.txt";
 begin
     main_map: main port map(inA, inB, inC0(1), outC4(1), outZ);
-    main_mod_map: main_mod port map(inA, inB, inC0(1), outC4_mod(1), outZ_mod);
   
     process
         variable row, row_ethalon, row_out, row_out_mod : line;
@@ -69,18 +67,7 @@ begin
                         write (row_out, failed);
                     end if;
                     writeline (file_write, row_out);
-                    
-                    if (to_integer(unsigned(outZ_mod)) = to_integer(unsigned(outZ))) then
-                        if (to_integer(unsigned(outC4_mod)) = to_integer(unsigned(outC4))) then
-                            write (row_out_mod, success);
-                        else
-                            write (row_out_mod, failed);
-                        end if;
-                    else
-                        write (row_out_mod, failed);
-                    end if;
-                    writeline (file_write_mod, row_out_mod);
-          
+                  
                     wait for 1 ns;
                     
                 end loop;
