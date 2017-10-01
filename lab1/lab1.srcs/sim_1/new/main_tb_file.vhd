@@ -60,8 +60,10 @@ begin
                         read(row_ethalon, v_data_read_ethalon);
                         if (v_data_read_ethalon = to_integer(unsigned(outC4))) then
                             write (row_out, success);
+                            report "Expected " & integer'image(v_data_read_ethalon) & ", but found " & integer'image(to_integer(unsigned(outC4))) severity error;
                         else
                             write (row_out, failed);
+                            report "Expected " & integer'image(v_data_read_ethalon) & ", but found " & integer'image(to_integer(unsigned(outZ))) severity error;
                         end if;
                     else
                         write (row_out, failed);

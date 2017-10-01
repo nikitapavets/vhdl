@@ -59,9 +59,11 @@ begin
                             write (row_out, success);
                         else
                             write (row_out, failed);
+                            report "Expected " & integer'image(to_integer(unsigned(outC4_mod))) & ", but found " & integer'image(to_integer(unsigned(outC4))) severity error;
                         end if;
                     else
                         write (row_out, failed);
+                        report "Expected " & integer'image(to_integer(unsigned(outZ_mod))) & ", but found " & integer'image(to_integer(unsigned(outZ))) severity error;
                     end if;
                     
                     writeline (file_write, row_out);
