@@ -15,14 +15,6 @@ architecture Behavioral of main_tb_file is
                Z : out STD_LOGIC_VECTOR (4 downto 1));
     end component;
     
-    component main_mod is   
-        port ( A : in STD_LOGIC_VECTOR (4 downto 1);
-               B : in STD_LOGIC_VECTOR (4 downto 1);
-               C0: in STD_LOGIC;
-               C4: out STD_LOGIC;
-               Z : out STD_LOGIC_VECTOR (4 downto 1));
-    end component;
-    
     signal inC0 : STD_LOGIC_VECTOR (1 downto 1);
     signal inA, inB : STD_LOGIC_VECTOR (4 downto 1);
     signal outC4 : STD_LOGIC_VECTOR (1 downto 1);
