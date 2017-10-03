@@ -34,38 +34,34 @@ begin
         variable v_data_read, v_data_read_ethalon : integer;
     begin
 
-        for c0_loop in 0 to 1 loop
-            for a_loop in 0 to 15 loop
-                for b_loop in 0 to 15 loop
+        while(not(endfile(file_read)) and not(endfile(file_read_ethalon))) loop
+            
+            readline(file_read, row);
+            read(row, v_data_read);
+            inC0 <= std_logic_vector(to_unsigned(v_data_read, inC0'length));
+            read(row, v_data_read);
+            inA <= std_logic_vector(to_unsigned(v_data_read, inA'length));
+            read(row, v_data_read);
+            inB <= std_logic_vector(to_unsigned(v_data_read, inB'length));
+          
+            readline(file_read_ethalon, row_ethalon);
+            read(row_ethalon, v_data_read_ethalon);
+            if (v_data_read_ethalon = to_integer(unsigned(outZ))) then
+                read(row_ethalon, v_data_read_ethalon);
+                if (v_data_read_ethalon = to_integer(unsigned(outC4))) then
+                    write (row_out, success);
+                else
+                    write (row_out, failed);
+                    report "Expected " & integer'image(v_data_read_ethalon) & ", but found " & integer'image(to_integer(unsigned(outC4))) severity error;
+                end if;
+            else
+                write (row_out, failed);
+                report "Expected " & integer'image(v_data_read_ethalon) & ", but found " & integer'image(to_integer(unsigned(outZ))) severity error;
+            end if;
+            writeline (file_write, row_out);
+          
+            wait for 1 ns;
                     
-                    readline(file_read, row);
-                    read(row, v_data_read);
-                    inC0 <= std_logic_vector(to_unsigned(v_data_read, inC0'length));
-                    read(row, v_data_read);
-                    inA <= std_logic_vector(to_unsigned(v_data_read, inA'length));
-                    read(row, v_data_read);
-                    inB <= std_logic_vector(to_unsigned(v_data_read, inB'length));
-                  
-                    readline(file_read_ethalon, row_ethalon);
-                    read(row_ethalon, v_data_read_ethalon);
-                    if (v_data_read_ethalon = to_integer(unsigned(outZ))) then
-                        read(row_ethalon, v_data_read_ethalon);
-                        if (v_data_read_ethalon = to_integer(unsigned(outC4))) then
-                            write (row_out, success);
-                        else
-                            write (row_out, failed);
-                            report "Expected " & integer'image(v_data_read_ethalon) & ", but found " & integer'image(to_integer(unsigned(outC4))) severity error;
-                        end if;
-                    else
-                        write (row_out, failed);
-                        report "Expected " & integer'image(v_data_read_ethalon) & ", but found " & integer'image(to_integer(unsigned(outZ))) severity error;
-                    end if;
-                    writeline (file_write, row_out);
-                  
-                    wait for 1 ns;
-                    
-                end loop;
-            end loop;
         end loop;
         
         wait;
