@@ -3,7 +3,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity counter is
     port (
-        CLOCK: in std_logic;
         CLR: in std_logic;
         UP: in std_logic;
         DOWN: in std_logic;
@@ -19,7 +18,6 @@ architecture Behavioral of counter is
 
     component cell is
         port (  
-            CLOCK: in std_logic;
             X : in std_logic;
             nLOAD: in std_logic;
             CLR: in std_logic;
@@ -35,7 +33,6 @@ architecture Behavioral of counter is
     
     component jk_trigger is
         port (  
-            CLOCK: in std_logic;
             notR: in  STD_LOGIC;
             J: in  STD_LOGIC;
             Clk: in  STD_LOGIC;
@@ -49,25 +46,40 @@ architecture Behavioral of counter is
     signal nextUP : std_logic;
     signal nextDOWN : std_logic;
     signal notQ: std_logic_vector (3 downto 0);
+    
+    signal temporal: STD_LOGIC;
+    signal UP_DIV: STD_LOGIC;
+    signal counter : integer range 0 to 90000000 := 0;
 
 begin
 
+    frequency_divider: process (UP) begin
+        if rising_edge(UP) then
+            if (counter = 90000000) then
+                temporal <= NOT(temporal);
+                counter <= 0;
+            else
+                counter <= counter + 1;
+            end if;
+        end if;
+    end process;
+    
+    UP_DIV <= temporal;
+
     up_down: jk_trigger port map(
-        CLOCK => CLOCK,
         notR => DOWN,
         J => '0',
         Clk => '0',
         K => '0',
-        notS => UP,
+        notS => UP_DIV,
         Q => nextUP,
         notQ => nextDOWN
     );
     
     qA: jk_trigger port map(
-        CLOCK => CLOCK,
         notR => ((not X(0)) nand (not nLOAD)) and (not CLR),
         J => notQ(0),
-        Clk => DOWN nand UP,
+        Clk => DOWN nand UP_DIV,
         K => not notQ(0),
         notS => not (X(0) and (not CLR) and (not nLOAD)),
         Q => Q(0),
@@ -75,7 +87,6 @@ begin
     );
     
     cellB: cell port map(
-        CLOCK => CLOCK,
         X => X(1),
         nLOAD => not nLOAD,
         CLR => not CLR,
@@ -83,13 +94,12 @@ begin
         CARRY2 => notQ(0),
         DOWN => nextDOWN,
         UP => nextUP,
-        Clk => DOWN nand UP,
+        Clk => DOWN nand UP_DIV,
         Q => Q(1),
         notQ => notQ(1)
     );
     
     cellC: cell port map(
-        CLOCK => CLOCK,
         X => X(2),
         nLOAD => not nLOAD,
         CLR => not CLR,
@@ -97,13 +107,12 @@ begin
         CARRY2 => notQ(0) and notQ(1),
         DOWN => nextDOWN,
         UP => nextUP,
-        Clk => DOWN nand UP,
+        Clk => DOWN nand UP_DIV,
         Q => Q(2),
         notQ => notQ(2)
     );
         
     cellD: cell port map(
-        CLOCK => CLOCK,
         X => X(3),
         nLOAD => not nLOAD,
         CLR => not CLR,
@@ -111,19 +120,12 @@ begin
         CARRY2 => notQ(0) and notQ(1) and notQ(2),
         DOWN => nextDOWN,
         UP => nextUP,
-        Clk => DOWN nand UP,
+        Clk => DOWN nand UP_DIV,
         Q => Q(3),
         notQ => notQ(3)
     );
-
-    process(CLOCK, notQ, UP, DOWN)
-    begin
-        if CLOCK'event and (CLOCK = '1') then
     
-            nCO <= not ((not notQ(0)) and (not notQ(1)) and (not notQ(2)) and (not notQ(3)) and (not UP));
-            nBO <= not (notQ(0) and notQ(1) and notQ(2) and notQ(3) and (not DOWN));
-            
-        end if;
-    end process;
+    nCO <= not ((not notQ(0)) and (not notQ(1)) and (not notQ(2)) and (not notQ(3)) and (not UP_DIV));
+    nBO <= not (notQ(0) and notQ(1) and notQ(2) and notQ(3) and (not DOWN));
 
 end Behavioral;
