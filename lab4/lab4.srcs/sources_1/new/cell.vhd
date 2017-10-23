@@ -3,7 +3,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity cell is
     port ( 
-        CLOCK: in std_logic;
         X : in STD_LOGIC;
         nLOAD: in STD_LOGIC;
         CLR: in STD_LOGIC;
@@ -21,7 +20,6 @@ architecture Behavioral of cell is
 
     component jk_trigger is
         port (  
-            CLOCK: in std_logic;
             notR: in  STD_LOGIC;
             J: in  STD_LOGIC;
             Clk: in  STD_LOGIC;
@@ -39,18 +37,11 @@ architecture Behavioral of cell is
 
 begin
 
-    JK: jk_trigger port map(CLOCK, notR, Jsig, Clk, not Jsig, notS, Q, notQsig);
+    JK: jk_trigger port map(notR, Jsig, Clk, not Jsig, notS, Q, notQsig);
 
-    process (CLOCK, X, nLOAD, CLR, CARRY1, notQsig, UP, CARRY2, DOWN)
-    begin
-        if CLOCK'event and CLOCK = '1' then
-        
-            notS <= not (X and nLOAD and CLR);
-            notR <= ((not X) nand nLOAD) and CLR;
-            Jsig <= ((CARRY1 xor (not notQsig)) and UP) or (((not notQsig) xor CARRY2) and DOWN);
-            notQ <= notQsig; 
-            
-        end if;
-    end process;
+    notS <= not (X and nLOAD and CLR);
+    notR <= ((not X) nand nLOAD) and CLR;
+    Jsig <= ((CARRY1 xor (not notQsig)) and UP) or (((not notQsig) xor CARRY2) and DOWN);
+    notQ <= notQsig; 
 
 end Behavioral;

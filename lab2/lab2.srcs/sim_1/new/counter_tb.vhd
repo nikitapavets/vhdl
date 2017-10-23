@@ -42,7 +42,7 @@ begin
         X <= "0100";
         nLOAD <= '0';
         wait for clk_period;
-        nLOAD <= '1';
+        nLOAD <= '0';
         wait for clk_period;
         CLR <= '1';
         wait for clk_period;

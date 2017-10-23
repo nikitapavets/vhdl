@@ -49,13 +49,14 @@ architecture Behavioral of counter is
     
     signal temporal: STD_LOGIC;
     signal UP_DIV: STD_LOGIC;
-    signal counter : integer range 0 to 90000000 := 0;
+    signal DOWN_DIV: STD_LOGIC;
+    signal counter : integer range 0 to 45000000 := 0;
 
 begin
 
     frequency_divider: process (UP) begin
         if rising_edge(UP) then
-            if (counter = 90000000) then
+            if (counter = 45000000) then
                 temporal <= NOT(temporal);
                 counter <= 0;
             else
@@ -63,11 +64,21 @@ begin
             end if;
         end if;
     end process;
+
+    process (DOWN, temporal)
+    begin
+        if DOWN = '1' then
+            UP_DIV <= temporal;
+            DOWN_DIV <= '1';
+        else
+            UP_DIV <= '1';
+            DOWN_DIV <= temporal;
+        end if;
+    end process;
     
-    UP_DIV <= temporal;
 
     up_down: jk_trigger port map(
-        notR => DOWN,
+        notR => DOWN_DIV,
         J => '0',
         Clk => '0',
         K => '0',
@@ -79,7 +90,7 @@ begin
     qA: jk_trigger port map(
         notR => ((not X(0)) nand (not nLOAD)) and (not CLR),
         J => notQ(0),
-        Clk => DOWN nand UP_DIV,
+        Clk => DOWN_DIV nand UP_DIV,
         K => not notQ(0),
         notS => not (X(0) and (not CLR) and (not nLOAD)),
         Q => Q(0),
@@ -94,7 +105,7 @@ begin
         CARRY2 => notQ(0),
         DOWN => nextDOWN,
         UP => nextUP,
-        Clk => DOWN nand UP_DIV,
+        Clk => DOWN_DIV nand UP_DIV,
         Q => Q(1),
         notQ => notQ(1)
     );
@@ -107,7 +118,7 @@ begin
         CARRY2 => notQ(0) and notQ(1),
         DOWN => nextDOWN,
         UP => nextUP,
-        Clk => DOWN nand UP_DIV,
+        Clk => DOWN_DIV nand UP_DIV,
         Q => Q(2),
         notQ => notQ(2)
     );
@@ -120,12 +131,12 @@ begin
         CARRY2 => notQ(0) and notQ(1) and notQ(2),
         DOWN => nextDOWN,
         UP => nextUP,
-        Clk => DOWN nand UP_DIV,
+        Clk => DOWN_DIV nand UP_DIV,
         Q => Q(3),
         notQ => notQ(3)
     );
     
     nCO <= not ((not notQ(0)) and (not notQ(1)) and (not notQ(2)) and (not notQ(3)) and (not UP_DIV));
-    nBO <= not (notQ(0) and notQ(1) and notQ(2) and notQ(3) and (not DOWN));
+    nBO <= not (notQ(0) and notQ(1) and notQ(2) and notQ(3) and (not DOWN_DIV));
 
 end Behavioral;
